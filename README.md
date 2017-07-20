@@ -1,2 +1,2 @@
 # WordRecognition
-Projeto simples que separa os caracteres de uma imagem e de acordo com uma base de imagens feita pelo programador, é feito uma comparação para reconhecer os caracteres daquela imagem. Ele não reconhece espaços.
+Projeto simples. Separa os caracteres de uma imagem específica e de acordo com uma base de imagens, é feito uma comparação para reconhecimento. A aplicação não reconhecer espaços entre palavras
