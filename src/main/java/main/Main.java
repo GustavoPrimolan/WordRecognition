@@ -16,7 +16,7 @@ public class Main {
         CharacterRecognizer cr = new CharacterRecognizer(imagem);
         String imagemBinaria = "imagensSeparadas/numeroContaBinario.png";
         //NECESSÁRIO SEMPRE FAZER A BINARIAZAÇÃO DA IMAGEM
-        cr.binarizaImagem(imagem, imagemBinaria, 155);
+        cr.binarizaImagem(imagemBinaria, 155);
         
         File imgBinaria = new File(imagemBinaria);
         //cr.imagemJusta(imgBinaria);

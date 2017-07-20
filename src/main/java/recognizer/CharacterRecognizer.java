@@ -27,9 +27,9 @@ public class CharacterRecognizer {
     }
 
     //MÉTODO COM O INTUITO DE BINARIZAR A IMAGEM
-    public void binarizaImagem(File imagem, String diretorioImagem, int limiar) {
+    public void binarizaImagem(String diretorioImagem, int limiar) {
         //INSTANCIA A IMAGEM
-        ImagePlus img = ij.IJ.openImage(imagem.getAbsolutePath());
+        ImagePlus img = ij.IJ.openImage(imagemOriginal.getAbsolutePath());
 
         //ABRE O CONVERTER PARA CONVERTER PARA ESCALA DE CINZA EM 8 BITS
         ImageConverter ic = new ImageConverter(img);
