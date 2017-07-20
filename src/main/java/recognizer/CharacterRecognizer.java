@@ -16,18 +16,42 @@ public class CharacterRecognizer {
 
     private File imagemOriginal;
     private int qtdCarac = 0;
-    
-    public int getQtdCarac(){
+    private File dirProjeto = null;
+    private File dirImagemBinaria = null;
+    private File dirBaseImagens = null;
+    private File dirImagensCortadas = null;
+
+    public int getQtdCarac() {
         return this.qtdCarac;
     }
-    
+
     public CharacterRecognizer(File imagemOriginal) {
+        this.dirProjeto = new File("C:\\WordRecognition");
+        this.dirImagemBinaria = new File(dirProjeto.getAbsolutePath() + "\\ImagemBinaria");
+        this.dirBaseImagens = new File(dirProjeto.getAbsolutePath() + "\\BancoImagens");
+        this.dirImagensCortadas = new File(dirProjeto.getAbsolutePath() + "\\ImagensCortadas");
+        if (!dirProjeto.exists()) {
+            dirProjeto.mkdir();
+        }
+
+        if (!dirImagemBinaria.exists()) {
+            dirImagemBinaria.mkdir();
+        }
+
+        if (!dirBaseImagens.exists()) {
+            dirBaseImagens.mkdir();
+        }
+
+        if (!dirImagensCortadas.exists()) {
+            dirImagensCortadas.mkdir();
+        }
+
         this.imagemOriginal = imagemOriginal;
 
     }
 
     //MÉTODO COM O INTUITO DE BINARIZAR A IMAGEM
-    public void binarizaImagem(String diretorioImagem, int limiar) {
+    private File binarizaImagem(int limiar) {
         //INSTANCIA A IMAGEM
         ImagePlus img = ij.IJ.openImage(imagemOriginal.getAbsolutePath());
 
@@ -51,9 +75,12 @@ public class CharacterRecognizer {
             }
         }
 
-        //O CAMINHO DEVERÁ SER SALVO JUNTO COM O NOME DO ARQUIVO
-        IJ.save(img, diretorioImagem);
+        File imagemBinaria = new File(dirImagemBinaria.getAbsolutePath() + "\\Binaria-" + imagemOriginal.getName());
 
+        //O CAMINHO DEVERÁ SER SALVO JUNTO COM O NOME DO ARQUIVO
+        IJ.save(img, imagemBinaria.getAbsolutePath());
+
+        return imagemBinaria;
     }
 
     private ImagePlus imagemJusta(File imagemBinaria) {
@@ -106,13 +133,8 @@ public class CharacterRecognizer {
 
         //CRIA A IMAGEM COM O TAMANHO EXATAMENTE DOS CARACTERES
         ImagePlus imagemJusta = ij.IJ.createImage("ImagemJusta", "png", larguraJusta, alturaJusta, 8);
-        File dirImagensSeparadas = new File("imagensSeparadas/");
-        
-        if(!dirImagensSeparadas.exists()){
-            dirImagensSeparadas.mkdir();
-        }
-        
-        String dirImagemJusta = "imagensSeparadas/imagemJusta.png";
+
+        String dirImagemJusta = dirImagemBinaria.getAbsolutePath() + "\\ImagemJusta-" + imagemOriginal.getName();
         ImageProcessor ipJusta = imagemJusta.getProcessor();
 
         //JOGA OS PIXELS DA IMAGEM BINARIA PARA A IMAGEM JUSTA
@@ -180,7 +202,7 @@ public class CharacterRecognizer {
                     }
                 }
 
-                IJ.save(caracter, "imagensSeparadas/caracter" + carac + ".png");
+                IJ.save(caracter, dirImagensCortadas.getAbsolutePath() + "\\caracter" + carac + ".png");
                 slicedImages.add(caracter);
                 carac++;
                 larguraCaracAnt = i;
@@ -208,18 +230,16 @@ public class CharacterRecognizer {
         return slicedImages;
     }
 
-    //MÉTODO QUE RECONHECE OS CARACTERES ATRAVÉS DA PASTA imagensParaComparacao
-    public String recognize(File imagemBinaria) {
+    //MÉTODO QUE RECONHECE OS CARACTERES ATRAVÉS DA PASTA BaseImagens
+    public String recognize(int limiar) {
         String palavra = "";
-
+        
+        File imagemBinaria = binarizaImagem(limiar);
+        
         List<ImagePlus> slicedImages = imagensSeparadas(imagemJusta(imagemBinaria));
-        File dirImagensParaComparar = new File("imagensParaComparar");
 
-        if (!dirImagensParaComparar.exists()) {
-            dirImagensParaComparar.mkdir();
-        }
+        File[] caracteres = dirBaseImagens.listFiles();
 
-        File[] caracteres = dirImagensParaComparar.listFiles();
         //System.out.println("TAMANHO SLICED IMAGES: " + slicedImages.size());
         this.qtdCarac = slicedImages.size();
         for (ImagePlus si : slicedImages) {
@@ -242,18 +262,18 @@ public class CharacterRecognizer {
                             int pixelComparacao = ipComparacao.getPixel(j, k);
                             int pixelSliced = ipSliced.getPixel(j, k);
                             if (pixelComparacao != pixelSliced) {
-                                encontrouCaracter = false;                                
+                                encontrouCaracter = false;
                                 contadorErros++;
                                 break;
                             }
 
                         }
                         //SE TEM PIXEL DIFERENTE, PODE SAIR DO LOOP
-                        if(!encontrouCaracter){
+                        if (!encontrouCaracter) {
                             break;
                         }
                     }
-                }else{
+                } else {
                     encontrouCaracter = false;
                 }
                 //SE ENCONTROU O CARACTER - CONCATENA NA PALAVRA E SAI DO LOOP
@@ -262,10 +282,10 @@ public class CharacterRecognizer {
                     //System.out.println("Palavra: " + palavra);
                     break;
                 }
-                
+
             }
-            
-            if (contadorErros == (caracteres.length - 1)) {
+
+            if ((contadorErros == (caracteres.length - 1)) || caracteres.length == 0) {
                 try {
                     System.out.println("NÃO IDENTIFICOU IMAGEM - VERIFICAR");
                     System.in.read();
@@ -273,7 +293,6 @@ public class CharacterRecognizer {
 
                 }
             }
-
         }
 
         return palavra;

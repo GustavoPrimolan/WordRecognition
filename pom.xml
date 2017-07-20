@@ -12,6 +12,7 @@
     </properties>
     
     <dependencies>
+        
         <!-- IMAGEJ DEPENDENCY-->
         <dependency>
             <groupId>imagej</groupId>
