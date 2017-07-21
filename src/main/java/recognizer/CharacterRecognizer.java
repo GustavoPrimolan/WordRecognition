@@ -59,11 +59,20 @@ public class CharacterRecognizer {
         ImageConverter ic = new ImageConverter(img);
         //CONVERTE PARA 8 BITS
         ic.convertToGray8();
+        
         //ATUALIZA E DESENHA A IMAGEM
         img.updateAndDraw();
-
+        
+        //EQUALIZA
+        //ContrastEnhancer ce = new ContrastEnhancer();
+        //ce.equalize(img);
+        
+        //ATUALIZA
+        img.updateAndDraw();
+        
         ImageProcessor ip = img.getProcessor();
-
+        
+        
         //BINARIZA A IMAGEM
         for (int i = 0; i < ip.getWidth(); i++) {
             for (int j = 0; j < ip.getHeight(); j++) {
@@ -192,7 +201,7 @@ public class CharacterRecognizer {
             //POIS ELE NUNCA TERÁ UMA COLUNA EM BRANCO APÓS ELE
             if ((!encontrouPixelPreto && encontrouCarac) || ultimoCarac) {
                 encontrouCarac = false;
-                ImagePlus caracter = ij.IJ.createImage("ImagemJusta " + carac, "png", i - larguraCaracAnt, imgJusta.getHeight(), 8);
+                ImagePlus caracter = ij.IJ.createImage("caracter" + carac, "png", i - larguraCaracAnt, imgJusta.getHeight(), 8);
                 ImageProcessor ipCaracter = caracter.getProcessor();
                 //MONTA O CARACTER NA IMAGEM
                 //COMEÇA DA LARGURA DO CARACTERE ANTERIOR E VAI ATÉ O i
@@ -280,17 +289,24 @@ public class CharacterRecognizer {
                     encontrouCaracter = false;
                 }
                 //SE ENCONTROU O CARACTER - CONCATENA NA PALAVRA E SAI DO LOOP
+                //NECESSÁRIO UTILIZAR O CIFRÃO "$" COMO CARACTER CORINGA
+                //POIS PODE HAVER MAIS DE UM 6 COM FORMATO DIFERENTE
                 if (encontrouCaracter) {
-                    palavra = palavra + caractere.getName().replace(".png", "");
+                    palavra = palavra + caractere.getName().replaceAll("[$].*", "");
                     //System.out.println("Palavra: " + palavra);
                     break;
                 }
 
             }
-
-            if ((contadorErros == (caracteres.length - 1)) || caracteres.length == 0) {
+            //SE A QUANTIDADE DE ERROS FOR IGUAL A QUANTIDADE DE CARACTERES NA BASE
+            //SIGNIFICA QUE NÃO ACERTOU O CARACTERE
+            if ((contadorErros == caracteres.length)) {
                 try {
+                    
                     System.out.println("NÃO IDENTIFICOU IMAGEM - VERIFICAR O DIRETORIO: " + dirBaseImagens.getAbsolutePath());
+                    System.out.println("Não conseguiu identificar: " + si.getTitle());
+                    System.out.println("Vezes que errou: " + contadorErros);
+                    System.out.println("Quantidade de caracteres na base de imagens: " + caracteres.length);
                     System.in.read();
                 } catch (Exception e2) {
 
