@@ -287,7 +287,7 @@ public class CharacterRecognizer {
 
             if ((contadorErros == (caracteres.length - 1)) || caracteres.length == 0) {
                 try {
-                    System.out.println("NÃO IDENTIFICOU IMAGEM - VERIFICAR");
+                    System.out.println("NÃO IDENTIFICOU IMAGEM - VERIFICAR O DIRETORIO: " + dirBaseImagens.getAbsolutePath());
                     System.in.read();
                 } catch (Exception e2) {
 
