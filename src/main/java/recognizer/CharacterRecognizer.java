@@ -261,6 +261,7 @@ public class CharacterRecognizer {
                         for (int k = 0; k < ipComparacao.getHeight(); k++) {
                             int pixelComparacao = ipComparacao.getPixel(j, k);
                             int pixelSliced = ipSliced.getPixel(j, k);
+                            
                             if (pixelComparacao != pixelSliced) {
                                 encontrouCaracter = false;
                                 contadorErros++;
@@ -268,12 +269,14 @@ public class CharacterRecognizer {
                             }
 
                         }
-                        //SE TEM PIXEL DIFERENTE, PODE SAIR DO LOOP
+                        //SE TEM PIXEL DIFERENTE, SAIR DO LOOP
                         if (!encontrouCaracter) {
                             break;
                         }
                     }
+                    //CONTA COMO UM ERRO QUANDO A IMAGEM NÃO TEM A MESMA LARGURA QUE A COMPARADA
                 } else {
+                    contadorErros++;
                     encontrouCaracter = false;
                 }
                 //SE ENCONTROU O CARACTER - CONCATENA NA PALAVRA E SAI DO LOOP
